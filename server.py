@@ -2,6 +2,8 @@
 from mcp.server.fastmcp import FastMCP
 import gmail as gw
 import gcalendar as cl
+import gsheets as gsh
+import gdocs as gd
 from typing import List, Dict, Any, Optional
 # Create FastMCP server instance
 mcp = FastMCP("google-workspace")
@@ -109,7 +111,6 @@ def list_events(max_results: int = 10, time_min: str = None, time_max: str = Non
     """
     return cl.list_events(max_results=max_results, time_min=time_min, time_max=time_max)
 
-
 @mcp.tool()
 def create_event(summary: str, start: str, end: str, attendees: list = None, description: str = None) -> Dict[str, Any]:
     """
@@ -131,7 +132,6 @@ def create_event(summary: str, start: str, end: str, attendees: list = None, des
             - "attendees" (list, optional): Attendee details.
     """
     return cl.create_event(summary=summary, start=start, end=end, attendees=attendees, description=description)
-
 
 @mcp.tool()
 def update_event(event_id: str, summary: str = None, start: str = None, end: str = None, attendees: list = None, description: str = None) -> Dict[str, Any]:
@@ -156,7 +156,6 @@ def update_event(event_id: str, summary: str = None, start: str = None, end: str
     """
     return cl.update_event(event_id=event_id, summary=summary, start=start, end=end, attendees=attendees, description=description)
 
-
 @mcp.tool()
 def delete_event(event_id: str) ->  Dict[str, str]:
     """
@@ -172,6 +171,180 @@ def delete_event(event_id: str) ->  Dict[str, str]:
     """
     return cl.delete_event(event_id=event_id)
 
+### SHEETS ###
+@mcp.tool()
+def list_sheets(query: Optional[str] = None, page_size: int = 10) -> List[Dict[str, Any]]:
+    """
+    List available Google Spreadsheet, optionally filter by name.
+
+    Args:
+        query (str, optional): Search query to filter Spreadsheet by title (case-insensitive).
+        page_size (int): Maximum number of Spreadsheet to return.
+
+    Returns:
+        List[Dict[str, Any]]: A list of Spreadsheet metadata objects.
+          Each dictionary contains:
+            - "id" (str): Document ID.
+            - "name" (str): Document title.
+    """
+    return gsh.list_sheets(query=query, page_size=page_size)
+
+@mcp.tool()
+def create_spreadsheet(title: str, sheet_titles: Optional[List[str]] = None) -> Dict[str, Any]:
+    """
+    Create a new Google Spreadsheet.
+
+    Args:
+        title (str): The name of the spreadsheet.
+        sheet_titles (List[str], optional): List of sheet names to create.
+
+    Returns:
+        Dict[str, Any]: Spreadsheet metadata including:
+            - "spreadsheetId" (str): Unique spreadsheet ID.
+            - "spreadsheetUrl" (str): Direct URL to the spreadsheet.
+    """
+    return gsh.create_spreadsheet(title, sheet_titles)
+
+@mcp.tool()
+def read_sheet(spreadsheet_id: str, range_name: str) -> List[List[Any]]:
+    """
+    Read values from a Google Spreadsheet.
+
+    Args:
+        spreadsheet_id (str): The ID of the spreadsheet.
+        range_name (str): The A1 notation of the range (e.g., "Sheet1!A1:C10").
+
+    Returns:
+        List[List[Any]]: List of rows, where each row is a list of cell values.
+    """
+    return gsh.read_sheet(spreadsheet_id, range_name)
+
+@mcp.tool()
+def write_sheet(spreadsheet_id: str, range_name: str, values: List[List[Any]]) -> Dict[str, Any]:
+    """
+    Write values to a Google Spreadsheet.
+
+    Args:
+        spreadsheet_id (str): The ID of the spreadsheet.
+        range_name (str): The A1 notation of the range (e.g., "Sheet1!A1").
+        values (List[List[Any]]): 2D array of values to write.
+
+    Returns:
+        Dict[str, Any]: API response including:
+            - "updatedRange" (str): Range that was updated.
+            - "updatedRows" (int): Number of rows updated.
+            - "updatedColumns" (int): Number of columns updated.
+    """
+    return gsh.write_sheet(spreadsheet_id, range_name, values)
+
+@mcp.tool()
+def append_sheet(spreadsheet_id: str, range_name: str, values: List[List[Any]]) -> Dict[str, Any]:
+    """
+    Append values to a Google Spreadsheet.
+
+    Args:
+        spreadsheet_id (str): The ID of the spreadsheet.
+        range_name (str): The A1 notation of the target range (e.g., "Sheet1!A:C").
+        values (List[List[Any]]): 2D array of values to append.
+
+    Returns:
+        Dict[str, Any]: API response with details of the update.
+    """
+    return gsh.append_sheet(spreadsheet_id, range_name, values)
+
+@mcp.tool()
+def delete_sheet(spreadsheet_id: str, sheet_id: int) -> Dict[str, Any]:
+    """
+    Delete a specific sheet tab from a Google Spreadsheet.
+
+    Args:
+        spreadsheet_id (str): The ID of the spreadsheet.
+        sheet_id (int): The ID of the sheet tab to delete.
+
+    Returns:
+        Dict[str, Any]: API response confirming the deletion.
+    """
+    return gsh.delete_sheet(spreadsheet_id, sheet_id)
+
+### DOCS ###
+@mcp.tool()
+def list_docs(query: str = None, page_size: int = 10):
+    """
+    List available Google Docs, optionally filter by name.
+
+    Args:
+        query (str, optional): Search query to filter docs by title (case-insensitive).
+        page_size (int): Maximum number of docs to return.
+
+    Returns:
+        List[Dict[str, Any]]: A list of document metadata with:
+            - "id" (str): Document ID.
+            - "name" (str): Document title.
+    """
+    return gd.list_docs(query=query, page_size=page_size)
+
+
+@mcp.tool()
+def create_doc(title: str):
+    """
+    Create a new Google Doc with the given title.
+
+    Args:
+        title (str): Title of the new document.
+
+    Returns:
+        Dict[str, Any]: Metadata of the created document:
+            - "documentId" (str): The new document’s ID.
+            - "title" (str): Title of the document.
+    """
+    return gd.create_doc(title=title)
+
+
+@mcp.tool()
+def read_doc(document_id: str):
+    """
+    Read the full text content of a Google Doc.
+
+    Args:
+        document_id (str): The ID of the document to read.
+
+    Returns:
+        str: The extracted plain text content of the document.
+    """
+    return gd.read_doc(document_id=document_id)
+
+
+@mcp.tool()
+def update_doc(document_id: str, text: str, location: str = "end"):
+    """
+    Insert or replace text in a Google Doc.
+
+    Args:
+        document_id (str): The ID of the document to update.
+        text (str): Text to insert.
+        location (str): Where to insert text:
+            - "end": Append to end of document.
+            - "start": Insert at beginning.
+            - "<index>": Insert at a given index position.
+
+    Returns:
+        Dict[str, Any]: API response confirming the update.
+    """
+    return gd.update_doc(document_id=document_id, text=text, location=location)
+
+
+@mcp.tool()
+def delete_doc(document_id: str):
+    """
+    Delete a Google Doc.
+
+    Args:
+        document_id (str): The ID of the document to delete.
+
+    Returns:
+        Dict[str, Any]: API response confirming deletion.
+    """
+    return gd.delete_doc(document_id=document_id)
 
 
 @mcp.tool()
