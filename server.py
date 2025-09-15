@@ -4,6 +4,7 @@ import gmail as gw
 import gcalendar as cl
 import gsheets as gsh
 import gdocs as gd
+import gdrive as gdr
 from typing import List, Dict, Any, Optional
 # Create FastMCP server instance
 mcp = FastMCP("google-workspace")
@@ -332,7 +333,6 @@ def update_doc(document_id: str, text: str, location: str = "end"):
     """
     return gd.update_doc(document_id=document_id, text=text, location=location)
 
-
 @mcp.tool()
 def delete_doc(document_id: str):
     """
@@ -345,6 +345,92 @@ def delete_doc(document_id: str):
         Dict[str, Any]: API response confirming deletion.
     """
     return gd.delete_doc(document_id=document_id)
+
+### DRIVE ###
+
+@mcp.tool()
+def list_files(page_size: int = 10) -> List[Dict[str, Any]]:
+    """
+    List files stored in Google Drive.
+
+    Args:
+        page_size (int): Maximum number of files to return.
+
+    Returns:
+        List[Dict[str, Any]]: A list of file metadata dictionaries.
+            Each dictionary includes:
+              - "id" (str): File ID
+              - "name" (str): File name
+              - "mimeType" (str): File type
+    """
+    return gdr.list_files(page_size=page_size)
+
+
+@mcp.tool()
+def search_files(query: str, page_size: int = 10) -> List[Dict[str, Any]]:
+    """
+    Search for files in Google Drive using query filters.
+
+    Args:
+        query (str): A Drive query string (e.g., "name contains 'report' and mimeType='application/pdf'").
+        page_size (int): Maximum number of results to return.
+
+    Returns:
+        List[Dict[str, Any]]: A list of matching file metadata dictionaries.
+            Each dictionary includes:
+              - "id" (str): File ID
+              - "name" (str): File name
+              - "mimeType" (str): File type
+    """
+    return gdr.search_files(query=query, page_size=page_size)
+
+
+@mcp.tool()
+def upload_file(file_path: str, mime_type: str, folder_id: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Upload a file to Google Drive.
+
+    Args:
+        file_path (str): Path to the local file to upload.
+        mime_type (str): MIME type of the file (e.g., "application/pdf").
+        folder_id (str, optional): Target folder ID. Defaults to "My Drive" if not provided.
+
+    Returns:
+        Dict[str, Any]: Metadata of the uploaded file, including:
+            - "id" (str): File ID
+            - "name" (str): File name
+    """
+    return gdr.upload_file(file_path=file_path, mime_type=mime_type, folder_id=folder_id)
+
+
+@mcp.tool()
+def download_file(file_id: str, destination_path: str) -> str:
+    """
+    Download a file from Google Drive.
+
+    Args:
+        file_id (str): The ID of the file to download.
+        destination_path (str): Local path where the downloaded file will be saved.
+
+    Returns:
+        str: The path to the downloaded file on the local system.
+    """
+    return gdr.download_file(file_id=file_id, destination_path=destination_path)
+
+
+@mcp.tool()
+def delete_file(file_id: str) -> Dict[str, Any]:
+    """
+    Delete a file from Google Drive.
+
+    Args:
+        file_id (str): The ID of the file to delete.
+
+    Returns:
+        Dict[str, Any]: Empty dictionary if the deletion was successful.
+    """
+    return gdr.delete_file(file_id=file_id)
+
 
 
 @mcp.tool()
