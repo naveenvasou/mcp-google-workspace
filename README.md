@@ -4,19 +4,19 @@ This project exposes Google Workspace APIs as **structured MCP tools**, so you c
 
 ---
 
-## ✨ Features
+## Features
 
-- 📧 **Gmail**: Search, read, and send emails with filters for sender, subject, and dates.  
-- 📅 **Calendar**: List, create, update, and delete events.  
-- 📝 **Docs**: Create new docs, read text, insert/update content, and delete documents.  
-- 📊 **Sheets**: Create spreadsheets, read/write cell ranges, and append rows.  
-- 📂 **Drive**: Search, upload, download, and delete files.   
+-  **Gmail**: Search, read, and send emails with filters for sender, subject, and dates.  
+-  **Calendar**: List, create, update, and delete events.  
+-  **Docs**: Create new docs, read text, insert/update content, and delete documents.  
+-  **Sheets**: Create spreadsheets, read/write cell ranges, and append rows.  
+-  **Drive**: Search, upload, download, and delete files.   
 
 All tools return structured JSON outputs — designed for **LLM use**.
 
 ---
 
-## 📦 Installation
+##  Installation
 
 ### Prerequisites
 - Python **3.10+**
@@ -99,7 +99,7 @@ Now you can say:
 
 ---
 
-## 🧰 Available Tools
+##  Available Tools
 
 ### Gmail
 - `search_emails` → Find emails with filters (sender, subject, unread, date ranges)  
@@ -132,7 +132,7 @@ Now you can say:
 - `delete_file` → Delete a file  
 
 ### Utility
-- `ping` → Health check (returns `"pong 🏓"`)
+- `ping` → Health check (returns `"pong "`)
 
 ---
 
